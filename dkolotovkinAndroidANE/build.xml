@@ -1,0 +1,53 @@
+<project name="DkolotovkinAndroidANE" basedir="." default="compile">
+	<property file="build.properties" />
+
+	<target name="clean">
+		<delete dir="${build}"/>
+	</target>
+
+	<target name="init" depends="clean">
+		<mkdir dir="${build}"/>
+		<mkdir dir="${build}/Android"/>
+		<mkdir dir="${build}/Default"/>
+	</target>
+
+	<target name="AndroidCopy" depends="init">
+		<copy file="${lib.jar}" todir="${build}/Android"/>
+	</target>
+
+
+	<target name="unzipSwf" depends="AndroidCopy">
+	        <mkdir dir="temp"/>
+		<unzip src="${lib.swc}" dest="temp"/>
+		<copy file="temp/library.swf" todir="${build}/Android"/>
+		<copy file="temp/library.swf" todir="${build}/Default"/>
+		<delete dir="temp"/>
+	</target>	
+
+
+	<target name="compile" depends="unzipSwf">
+		<java jar="${adt.jar}" fork="true" failonerror="true">
+			<arg value="-package"/>
+			<arg value="-target"/>
+			<arg value="ane"/>
+			<arg value="bin/${aneName.ane}"/>
+			<arg value="${extension.xml}"/>
+
+			<arg value="-swc"/>
+			<arg value="${lib.swc}"/>
+
+			<arg value="-platform"/> 
+			<arg value="Android-ARM"/>
+			<arg value="-C"/>
+			<arg value="${build}/Android"/>
+			<arg value="."/>
+			
+			<arg value="-platform"/> 
+			<arg value="default"/>
+			<arg value="-C"/>
+			<arg value="${build}/Default"/>
+			<arg value="."/>
+		</java>
+	</target>
+
+</project>
